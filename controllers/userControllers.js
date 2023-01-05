@@ -52,7 +52,29 @@ module.exports = {
       //       ? res.status(404).json({ message: "No user with that ID" })
       //       : Thoughts.deleteMany({ _id: { $in: user.thoughts } })
       //   )
-      .then(() => res.json({ message: "user and students deleted!" }))
+      .then(() => res.json({ message: "user deleted!" }))
+      .catch((err) => res.status(500).json(err));
+  },
+
+  // POST a friend to a User
+  addFriend(req, res) {
+    Users.findOneAndUpdate(
+      { _id: req.params.id },
+      { $addToSet: { friends: req.body } },
+      { runValidators: true, new: true }
+    )
+      .then((friend) => res.json(friend))
+      .catch((err) => res.status(500).json(err));
+  },
+
+  // DELETE a friend of a User
+  removeFriend(req, res) {
+    Users.findOneAndUpdate(
+      { _id: req.params.id },
+      { $pull: { friends: req.body._id } },
+      { new: true }
+    )
+      .then(() => res.json({ message: "friend deleted!" }))
       .catch((err) => res.status(500).json(err));
   },
 };

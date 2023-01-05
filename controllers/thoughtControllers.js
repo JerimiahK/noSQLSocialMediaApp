@@ -1,4 +1,5 @@
 const { Users, Thoughts } = require("../models");
+const { ObjectId } = require("mongoose").Types;
 const User = require("../models/Users");
 
 module.exports = {
@@ -46,7 +47,7 @@ module.exports = {
       { _id: req.params.id },
       { $set: req.body },
       { runValidators: true, new: true }
-    )
+    );
   },
 
   //DELETE a thought
@@ -61,6 +62,28 @@ module.exports = {
         )
       )
       .then(() => res.json({ message: "user and students deleted!" }))
+      .catch((err) => res.status(500).json(err));
+  },
+
+  // POST a friend to a User
+  addReaction(req, res) {
+    Thoughts.findOneAndUpdate(
+      { _id: req.params.id },
+      { $addToSet: { reactions: req.body } },
+      { runValidators: true, new: true }
+    )
+      .then((reaction) => res.json(reaction))
+      .catch((err) => res.status(500).json(err));
+  },
+
+  // DELETE a friend of a User
+  removeReaction(req, res) {
+    Thoughts.findOneAndUpdate(
+      { _id: req.params.id },
+      { $pull: { reactions: req.body } },
+      { runValidators: true, new: true }
+    )
+      .then(() => res.json({ message: "reaction deleted!" }))
       .catch((err) => res.status(500).json(err));
   },
 };
