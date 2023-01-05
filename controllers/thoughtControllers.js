@@ -1,6 +1,8 @@
-const { Thoughts, Users, Reactions } = require("../models");
+const { Users, Thoughts } = require("../models");
+const User = require("../models/Users");
 
 module.exports = {
+  // GET all thoughts
   getThoughts(req, res) {
     Thoughts.find()
       .then((thoughts) => res.json(thoughts))
@@ -8,6 +10,8 @@ module.exports = {
         return res.status(500).json(err);
       });
   },
+
+  //GET a single thought
   getSingleThought(req, res) {
     Thoughts.findOne({ _id: req.params.id })
       .select("-__v")
@@ -19,35 +23,43 @@ module.exports = {
       .catch((err) => res.status(500).json(err));
   },
 
+  //CREATE a thought
   createThought(req, res) {
     Thoughts.create(req.body)
       .then((thought) => {
         return Users.findOneAndUpdate(
-          { _id: req.body.id },
+          { username: req.body.username },
           { $addToSet: { thoughts: thought._id } },
           { new: true }
         );
       })
-      .then((user) =>
-        !user
-          ? res
-              .status(404)
-              .json({ message: "Tag created, but found no post with that ID" })
-          : res.json("Created the tag 🎉")
-      )
+      .then((user) => res.json(user))
       .catch((err) => {
         console.log(err);
         res.status(500).json(err);
       });
   },
 
+  //UPDATES a thought
+  updateThought(req, res) {
+    Thoughts.findOneAndUpdate(
+      { _id: req.params.id },
+      { $set: req.body },
+      { runValidators: true, new: true }
+    )
+  },
+
+  //DELETE a thought
   deleteThought(req, res) {
-    Thoughts.findOneAndDelete({ _id: req.params.id })
-      //   .then((user) =>
-      //     !user
-      //       ? res.status(404).json({ message: "No user with that ID" })
-      //       : Thoughts.deleteMany({ _id: { $in: user.thoughts } })
-      //   )
+    console.log(req.params);
+    Thoughts.findOneAndRemove({ _id: req.params.id })
+      .then(() =>
+        User.findOneAndUpdate(
+          { thoughts: req.params.id },
+          { $pull: { thoughts: req.params.id } },
+          { new: true }
+        )
+      )
       .then(() => res.json({ message: "user and students deleted!" }))
       .catch((err) => res.status(500).json(err));
   },

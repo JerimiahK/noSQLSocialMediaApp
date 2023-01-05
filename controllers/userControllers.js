@@ -9,6 +9,7 @@ module.exports = {
         return res.status(500).json(err);
       });
   },
+
   // GET single user
   getSingleUser(req, res) {
     console.log(req.params);
@@ -21,6 +22,7 @@ module.exports = {
       )
       .catch((err) => res.status(500).json(err));
   },
+
   // POST user
   createUser(req, res) {
     console.log(req.body);
@@ -32,6 +34,17 @@ module.exports = {
       });
   },
 
+  //UPDATE a User by ID
+  updateUser(req, res) {
+    console.log(req.body);
+    Users.findOneAndUpdate(
+      { _id: req.params.id },
+      { $set: req.body },
+      { runValidators: true, new: true }
+    ).then((user) => res.json(user));
+  },
+
+  // DELETE a User by ID
   deleteUser(req, res) {
     Users.findOneAndDelete({ _id: req.params.id })
       //   .then((user) =>
@@ -43,13 +56,3 @@ module.exports = {
       .catch((err) => res.status(500).json(err));
   },
 };
-
-//get all users
-//get one user by id with friend and thought data
-//post user
-//put user by id
-//delete user id
-
-// /api/users/:userId/friends/:friendId
-// post new friend to users friend list
-// delete
