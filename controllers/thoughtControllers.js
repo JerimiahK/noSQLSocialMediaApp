@@ -47,7 +47,8 @@ module.exports = {
       { _id: req.params.id },
       { $set: req.body },
       { runValidators: true, new: true }
-    );
+    )
+    .then((update) => res.json(update))
   },
 
   //DELETE a thought
