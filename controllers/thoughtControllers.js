@@ -61,7 +61,7 @@ module.exports = {
           { new: true }
         )
       )
-      .then(() => res.json({ message: "user and students deleted!" }))
+      .then(() => res.json({ message: "user deleted!" }))
       .catch((err) => res.status(500).json(err));
   },
 
